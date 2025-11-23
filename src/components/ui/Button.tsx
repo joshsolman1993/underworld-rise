@@ -10,17 +10,20 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     rightIcon?: React.ReactNode;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-    children,
-    className = '',
-    variant = 'primary',
-    size = 'md',
-    isLoading = false,
-    leftIcon,
-    rightIcon,
-    disabled,
-    ...props
-}) => {
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((
+    {
+        children,
+        className = '',
+        variant = 'primary',
+        size = 'md',
+        isLoading = false,
+        leftIcon,
+        rightIcon,
+        disabled,
+        ...props
+    },
+    ref
+) => {
     const baseStyles = "neon-button";
 
     const variants = {
@@ -40,6 +43,7 @@ export const Button: React.FC<ButtonProps> = ({
 
     return (
         <motion.button
+            ref={ref}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
             className={`${baseStyles} ${variants[variant] || ''} ${sizes[size]} ${className}`}
@@ -59,6 +63,8 @@ export const Button: React.FC<ButtonProps> = ({
             </span>
         </motion.button>
     );
-};
+});
+
+Button.displayName = 'Button';
 
 export default Button;

@@ -1,0 +1,3 @@
+﻿src/components/ui/CountUp.tsx(2,21): error TS6133: 'useRef' is declared but its value is never read.
+src/components/ui/CountUp.tsx(3,35): error TS6133: 'MotionValue' is declared but its value is never read.
+src/components/ui/ProgressBar.tsx(1,1): error TS6133: 'React' is declared but its value is never read.

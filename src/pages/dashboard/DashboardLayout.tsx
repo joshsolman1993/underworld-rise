@@ -5,9 +5,10 @@ import { useAuthStore } from '../../store/authStore'
 import { authApi } from '../../api/auth.api'
 import { socketClient } from '../../api/socket'
 import { useToast } from '../../contexts/ToastContext'
-import ProgressBar from '../../components/ui/ProgressBar'
 import Badge from '../../components/ui/Badge'
 import CountUp from '../../components/ui/CountUp'
+import ResourceHexagon from '../../components/ui/ResourceHexagon'
+import BottomNavigation from '../../components/layout/BottomNavigation'
 import {
     Home,
     Skull,
@@ -19,7 +20,11 @@ import {
     Users,
     TrendingUp,
     ShieldAlert,
-    Target
+    Target,
+    Heart,
+    Zap,
+    Brain,
+    Shield
 } from 'lucide-react'
 
 export default function DashboardLayout() {
@@ -124,31 +129,36 @@ export default function DashboardLayout() {
                         <Badge variant="success">Lvl {user.level}</Badge>
                     </div>
 
-                    {/* Stats */}
-                    <div style={{ flex: 1, display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-                        <div style={{ minWidth: '140px' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px', fontWeight: 500, textTransform: 'uppercase' }}>Health</div>
-                            <ProgressBar value={user.health} max={100} color="danger" showLabel={false} height="6px" />
-                            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginTop: '4px', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>{user.health}/100</div>
-                        </div>
-
-                        <div style={{ minWidth: '140px' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px', fontWeight: 500, textTransform: 'uppercase' }}>Energy</div>
-                            <ProgressBar value={user.energy} max={100} color="warning" showLabel={false} height="6px" />
-                            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginTop: '4px', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>{user.energy}/100</div>
-                        </div>
-
-                        <div style={{ minWidth: '140px' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px', fontWeight: 500, textTransform: 'uppercase' }}>Nerve</div>
-                            <ProgressBar value={user.nerve} max={100} color="primary" showLabel={false} height="6px" />
-                            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginTop: '4px', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>{user.nerve}/100</div>
-                        </div>
-
-                        <div style={{ minWidth: '140px' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px', fontWeight: 500, textTransform: 'uppercase' }}>Willpower</div>
-                            <ProgressBar value={user.willpower} max={100} color="success" showLabel={false} height="6px" />
-                            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginTop: '4px', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>{user.willpower}/100</div>
-                        </div>
+                    {/* Stats - Resource Hexagons */}
+                    <div style={{ flex: 1, display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <ResourceHexagon
+                            value={user.health}
+                            max={100}
+                            label="Health"
+                            icon={Heart}
+                            color="var(--color-danger)"
+                        />
+                        <ResourceHexagon
+                            value={user.energy}
+                            max={100}
+                            label="Energy"
+                            icon={Zap}
+                            color="var(--color-warning)"
+                        />
+                        <ResourceHexagon
+                            value={user.nerve}
+                            max={100}
+                            label="Nerve"
+                            icon={Brain}
+                            color="var(--color-accent-primary)"
+                        />
+                        <ResourceHexagon
+                            value={user.willpower}
+                            max={100}
+                            label="Willpower"
+                            icon={Shield}
+                            color="var(--color-success)"
+                        />
                     </div>
 
                     {/* Money */}
@@ -170,18 +180,20 @@ export default function DashboardLayout() {
             </header>
 
             <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-                {/* Sidebar */}
+                {/* Sidebar - Hidden on mobile */}
                 <motion.aside
                     initial={{ x: -250, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="hidden md:flex"
                     style={{
                         width: '250px',
                         background: 'rgba(8, 8, 10, 0.5)',
                         borderRight: '1px solid rgba(255, 255, 255, 0.05)',
                         padding: '16px',
                         overflowY: 'auto',
-                        backdropFilter: 'blur(4px)'
+                        backdropFilter: 'blur(4px)',
+                        flexDirection: 'column'
                     }}
                 >
                     <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -250,14 +262,26 @@ export default function DashboardLayout() {
                 </motion.aside>
 
                 {/* Main Content */}
-                <main style={{ flex: 1, padding: '32px', overflowY: 'auto', position: 'relative' }}>
+                <main style={{ flex: 1, padding: '32px', paddingBottom: '80px', overflowY: 'auto', position: 'relative' }}>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={location.pathname}
-                            initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                            initial={{
+                                opacity: 0,
+                                x: -20,
+                                filter: 'blur(4px) hue-rotate(90deg)'
+                            }}
+                            animate={{
+                                opacity: 1,
+                                x: 0,
+                                filter: 'blur(0px) hue-rotate(0deg)'
+                            }}
+                            exit={{
+                                opacity: 0,
+                                x: 20,
+                                filter: 'blur(4px) hue-rotate(-90deg)'
+                            }}
+                            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                             style={{ height: '100%' }}
                         >
                             <Outlet />
@@ -265,6 +289,9 @@ export default function DashboardLayout() {
                     </AnimatePresence>
                 </main>
             </div>
+
+            {/* Mobile Bottom Navigation */}
+            <BottomNavigation />
         </div>
     )
 }

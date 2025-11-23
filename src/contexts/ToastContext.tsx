@@ -63,6 +63,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                     {toasts.map((toast) => (
                         <Toast
                             key={toast.id}
+                            id={toast.id}
                             type={toast.type}
                             message={toast.message}
                             onClose={() => removeToast(toast.id)}

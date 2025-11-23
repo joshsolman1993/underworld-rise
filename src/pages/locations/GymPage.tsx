@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { gymApi, TrainingCosts, TrainResult } from '../../api/gym.api'
 import { useAuthStore } from '../../store/authStore'
+import { useFloatingText } from '../../contexts/FloatingTextContext'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import ProgressBar from '../../components/ui/ProgressBar'
@@ -29,10 +30,12 @@ const itemVariants = {
 
 export default function GymPage() {
     const user = useAuthStore((state) => state.user)
+    const { showFloatingText } = useFloatingText()
     const [costs, setCosts] = useState<TrainingCosts | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [training, setTraining] = useState<string | null>(null)
     const [result, setResult] = useState<TrainResult | null>(null)
+    const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({})
 
     useEffect(() => {
         loadCosts()
@@ -58,6 +61,21 @@ export default function GymPage() {
         try {
             const trainResult = await gymApi.train(stat)
             setResult(trainResult)
+
+            // Show floating text at button position
+            const button = buttonRefs.current[stat]
+            if (button) {
+                const rect = button.getBoundingClientRect()
+                const x = rect.left + rect.width / 2
+                const y = rect.top + rect.height / 2
+
+                // Get color based on stat
+                const statConfig = stats.find(s => s.key === stat)
+                const color = statConfig?.color || 'var(--color-success)'
+
+                showFloatingText(x, y, `+${trainResult.gain}`, color)
+            }
+
             // Reload costs to update current values
             await loadCosts()
         } catch (error: any) {
@@ -221,6 +239,7 @@ export default function GymPage() {
                                     </div>
 
                                     <Button
+                                        ref={(el) => buttonRefs.current[stat.key] = el}
                                         variant="primary"
                                         onClick={() => handleTrain(stat.key)}
                                         disabled={!canTrain || training !== null}
