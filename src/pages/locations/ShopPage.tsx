@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { shopApi, ShopItem, PurchaseResult } from '../../api/shop.api'
+import { shopApi, ShopItem } from '../../api/shop.api'
 import { useAuthStore } from '../../store/authStore'
 import { useToast } from '../../contexts/ToastContext'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import AnimatedCard from '../../components/ui/AnimatedCard'
-import { Crosshair, Shield, Car, Pill, Package, DollarSign, TrendingUp } from 'lucide-react'
+import { Crosshair, Shield, Car, Pill, Package } from 'lucide-react'
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -71,7 +71,7 @@ export default function ShopPage() {
 
     if (isLoading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-2xl)' }}>
+            <div className="flex justify-center p-2xl">
                 <div className="spinner" />
             </div>
         )
@@ -114,16 +114,17 @@ export default function ShopPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2xl)' }}
+            className="flex-col gap-xl"
         >
             {/* Header */}
             <motion.div
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.4 }}
+                className="glass-panel"
             >
-                <h1 style={{ marginBottom: 'var(--space-md)' }}>Black Market Shop</h1>
-                <p style={{ color: 'var(--color-text-secondary)' }}>
+                <h1 className="mb-md">Black Market Shop</h1>
+                <p className="text-secondary mb-0">
                     Buy weapons, armor, vehicles, and consumables to boost your criminal empire.
                 </p>
             </motion.div>
@@ -133,7 +134,7 @@ export default function ShopPage() {
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                style={{ display: 'flex', gap: 'var(--space-md)', flexWrap: 'wrap' }}
+                className="flex gap-md flex-wrap"
             >
                 {['all', 'weapon', 'armor', 'vehicle', 'consumable'].map((type) => (
                     <Button
@@ -151,7 +152,7 @@ export default function ShopPage() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-lg)' }}
+                className="grid-responsive"
             >
                 {filteredItems.map((item) => {
                     const canBuy = user && user.level >= item.requiredLevel && Number(user.moneyCash) >= Number(item.price)
@@ -159,38 +160,38 @@ export default function ShopPage() {
                     return (
                         <motion.div key={item.id} variants={itemVariants}>
                             <AnimatedCard variant={getItemVariant(item.type)}>
-                                <Card variant="glass" style={{ padding: 'var(--space-lg)', height: '100%' }}>
-                                    <div style={{ display: 'flex', alignItems: 'start', gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
+                                <Card variant="glass" className="p-lg h-full">
+                                    <div className="flex items-start gap-md mb-md">
                                         <div style={{ color: getItemColor(item.type), opacity: 0.7 }}>
                                             {getItemIcon(item.type)}
                                         </div>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 'var(--space-xs)' }}>
-                                                <h3 style={{ fontSize: 'var(--font-size-xl)' }}>{item.name}</h3>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start mb-xs">
+                                                <h3 className="text-xl">{item.name}</h3>
                                                 <Badge variant={canBuy ? 'success' : 'danger'}>
                                                     Lvl {item.requiredLevel}
                                                 </Badge>
                                             </div>
-                                            <Badge variant="info" style={{ fontSize: 'var(--font-size-xs)' }}>
+                                            <Badge variant="info" className="text-xs">
                                                 {item.type}
                                             </Badge>
                                         </div>
                                     </div>
 
-                                    <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-lg)' }}>
+                                    <p className="text-secondary text-sm mb-lg">
                                         {item.description}
                                     </p>
 
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', marginBottom: 'var(--space-lg)' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-sm)' }}>
-                                            <span style={{ color: 'var(--color-text-muted)' }}>Effect:</span>
-                                            <span style={{ color: getItemColor(item.type), fontFamily: 'var(--font-mono)' }}>
+                                    <div className="flex-col gap-sm mb-lg">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted">Effect:</span>
+                                            <span className="font-mono" style={{ color: getItemColor(item.type) }}>
                                                 +{item.effectValue} {item.effectStat}
                                             </span>
                                         </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-sm)' }}>
-                                            <span style={{ color: 'var(--color-text-muted)' }}>Price:</span>
-                                            <span style={{ color: 'var(--color-success)', fontWeight: 'var(--font-weight-bold)', fontFamily: 'var(--font-mono)' }}>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted">Price:</span>
+                                            <span className="text-success font-bold font-mono">
                                                 ${Number(item.price).toLocaleString()}
                                             </span>
                                         </div>
@@ -201,7 +202,7 @@ export default function ShopPage() {
                                         onClick={() => handlePurchase(item)}
                                         disabled={!canBuy || purchasing !== null}
                                         isLoading={purchasing === item.id}
-                                        style={{ width: '100%' }}
+                                        className="w-full"
                                     >
                                         {canBuy ? 'Buy Now' : user && user.level < item.requiredLevel ? 'Level Too Low' : 'Not Enough Cash'}
                                     </Button>

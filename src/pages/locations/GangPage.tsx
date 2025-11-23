@@ -1,12 +1,33 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { gangApi, Gang } from '../../api/gang.api'
-import { useAuthStore } from '../../store/authStore'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
+import Input from '../../components/ui/Input'
+import AnimatedCard from '../../components/ui/AnimatedCard'
+import { Users, Shield, Crown, DollarSign, UserPlus, LogOut, AlertTriangle } from 'lucide-react'
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+}
+
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: { duration: 0.3 }
+    }
+}
 
 export default function GangPage() {
-    const user = useAuthStore((state) => state.user)
     const [myGang, setMyGang] = useState<Gang | null>(null)
     const [allGangs, setAllGangs] = useState<Gang[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -91,7 +112,7 @@ export default function GangPage() {
 
     if (isLoading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-2xl)' }}>
+            <div className="flex justify-center p-2xl">
                 <div className="spinner" />
             </div>
         )
@@ -106,115 +127,128 @@ export default function GangPage() {
     }
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2xl)' }}>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="flex-col gap-xl"
+        >
             {/* Header */}
-            <div>
-                <h1 style={{ marginBottom: 'var(--space-md)' }}>Gang Management</h1>
-                <p style={{ color: 'var(--color-text-secondary)' }}>
+            <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.4 }}
+                className="glass-panel"
+            >
+                <h1 className="mb-md">Gang Management</h1>
+                <p className="text-secondary mb-0">
                     Join forces with other players to build a criminal empire. Gangs share a treasury and compete for reputation.
                 </p>
-            </div>
+            </motion.div>
 
             {/* My Gang Section */}
             {myGang ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
-                    <Card variant="elevated" style={{ padding: 'var(--space-2xl)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 'var(--space-lg)' }}>
-                            <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', marginBottom: 'var(--space-sm)' }}>
-                                    <h2 style={{ fontSize: 'var(--font-size-3xl)' }}>{myGang.name}</h2>
-                                    <Badge variant="primary">[{myGang.tag}]</Badge>
-                                    {myGang.myRole && <Badge variant={getRoleBadgeVariant(myGang.myRole)}>{myGang.myRole}</Badge>}
+                <motion.div
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex-col gap-lg"
+                >
+                    <AnimatedCard variant="info">
+                        <Card variant="elevated" className="p-2xl">
+                            <div className="flex justify-between items-start mb-lg">
+                                <div>
+                                    <div className="flex items-center gap-md mb-sm">
+                                        <h2 className="text-3xl">{myGang.name}</h2>
+                                        <Badge variant="info">[{myGang.tag}]</Badge>
+                                        {myGang.myRole && <Badge variant={getRoleBadgeVariant(myGang.myRole)}>{myGang.myRole}</Badge>}
+                                    </div>
+                                    <p className="text-muted flex items-center gap-xs">
+                                        <Crown size={16} className="text-warning" /> Leader: {myGang.leader.username}
+                                    </p>
                                 </div>
-                                <p style={{ color: 'var(--color-text-muted)' }}>Leader: {myGang.leader.username}</p>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>Reputation</div>
-                                <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-accent-gold)' }}>
-                                    {myGang.reputation.toLocaleString()}
+                                <div className="text-right">
+                                    <div className="text-xs text-muted">Reputation</div>
+                                    <div className="text-2xl font-bold text-accent-gold font-mono">
+                                        {myGang.reputation.toLocaleString()}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-lg)', marginBottom: 'var(--space-xl)' }}>
-                            <div>
-                                <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-xs)' }}>
-                                    Treasury
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xl">
+                                <div className="p-md bg-white/5 rounded-md border border-white/10">
+                                    <div className="text-xs text-muted mb-xs flex items-center gap-xs">
+                                        <DollarSign size={14} /> Treasury
+                                    </div>
+                                    <div className="text-xl font-bold text-success font-mono">
+                                        ${Number(myGang.treasury).toLocaleString()}
+                                    </div>
                                 </div>
-                                <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
-                                    ${Number(myGang.treasury).toLocaleString()}
+                                <div className="p-md bg-white/5 rounded-md border border-white/10">
+                                    <div className="text-xs text-muted mb-xs flex items-center gap-xs">
+                                        <Users size={14} /> Members
+                                    </div>
+                                    <div className="text-xl font-bold">
+                                        {myGang.memberCount || 0}
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-xs)' }}>
-                                    Members
-                                </div>
-                                <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)' }}>
-                                    {myGang.memberCount || 0}
-                                </div>
-                            </div>
-                        </div>
 
-                        {/* Deposit Form */}
-                        <form onSubmit={handleDeposit} style={{ marginBottom: 'var(--space-lg)' }}>
-                            <label style={{ display: 'block', marginBottom: 'var(--space-sm)', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                                Contribute to Treasury
-                            </label>
-                            <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
-                                <input
-                                    type="number"
-                                    value={depositAmount}
-                                    onChange={(e) => setDepositAmount(e.target.value)}
-                                    placeholder="Amount"
-                                    className="input-field"
-                                    style={{ flex: 1 }}
-                                />
-                                <Button variant="primary" type="submit">
-                                    Deposit
-                                </Button>
-                            </div>
-                        </form>
+                            {/* Deposit Form */}
+                            <form onSubmit={handleDeposit} className="mb-lg">
+                                <label className="block mb-sm text-sm font-semibold">
+                                    Contribute to Treasury
+                                </label>
+                                <div className="flex gap-md">
+                                    <Input
+                                        type="number"
+                                        value={depositAmount}
+                                        onChange={(e) => setDepositAmount(e.target.value)}
+                                        placeholder="Amount"
+                                        className="flex-1"
+                                    />
+                                    <Button variant="primary" type="submit">
+                                        Deposit
+                                    </Button>
+                                </div>
+                            </form>
 
-                        {/* Actions */}
-                        <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
-                            {myGang.myRole === 'leader' && (
-                                <Button variant="outline" onClick={handleDisband}>
-                                    Disband Gang
-                                </Button>
-                            )}
-                            {myGang.myRole !== 'leader' && (
-                                <Button variant="outline" onClick={handleLeave}>
-                                    Leave Gang
-                                </Button>
-                            )}
-                        </div>
-                    </Card>
+                            {/* Actions */}
+                            <div className="flex gap-md">
+                                {myGang.myRole === 'leader' && (
+                                    <Button variant="outline" onClick={handleDisband} className="text-danger border-danger hover:bg-danger/10">
+                                        <AlertTriangle size={16} className="mr-xs" /> Disband Gang
+                                    </Button>
+                                )}
+                                {myGang.myRole !== 'leader' && (
+                                    <Button variant="outline" onClick={handleLeave} className="text-warning border-warning hover:bg-warning/10">
+                                        <LogOut size={16} className="mr-xs" /> Leave Gang
+                                    </Button>
+                                )}
+                            </div>
+                        </Card>
+                    </AnimatedCard>
 
                     {/* Members List */}
                     {myGang.members && myGang.members.length > 0 && (
-                        <Card variant="glass" style={{ padding: 'var(--space-xl)' }}>
-                            <h3 style={{ marginBottom: 'var(--space-lg)' }}>Members ({myGang.members.length})</h3>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+                        <Card variant="glass" className="p-xl">
+                            <h3 className="mb-lg flex items-center gap-sm">
+                                <Users className="text-accent" /> Members ({myGang.members.length})
+                            </h3>
+                            <div className="flex-col gap-md">
                                 {myGang.members.map((member) => (
                                     <div
                                         key={member.id}
-                                        style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            padding: 'var(--space-md)',
-                                            background: 'var(--color-bg-tertiary)',
-                                            borderRadius: 'var(--radius-md)',
-                                        }}
+                                        className="flex justify-between items-center p-md bg-bg-tertiary rounded-md border border-white/5"
                                     >
                                         <div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+                                            <div className="flex items-center gap-md">
                                                 <strong>{member.user.username}</strong>
                                                 <Badge variant="success">Lvl {member.user.level}</Badge>
                                                 <Badge variant={getRoleBadgeVariant(member.role)}>{member.role}</Badge>
                                             </div>
-                                            <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: 'var(--space-xs)' }}>
-                                                Contributed: ${Number(member.contributedMoney).toLocaleString()}
+                                            <div className="text-sm text-muted mt-xs">
+                                                Contributed: <span className="text-success font-mono">${Number(member.contributedMoney).toLocaleString()}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -222,14 +256,19 @@ export default function GangPage() {
                             </div>
                         </Card>
                     )}
-                </div>
+                </motion.div>
             ) : (
                 /* No Gang - Create or Browse */
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
-                    <Card variant="glass" style={{ padding: 'var(--space-2xl)', textAlign: 'center' }}>
-                        <div style={{ fontSize: 'var(--font-size-4xl)', marginBottom: 'var(--space-md)' }}>👥</div>
-                        <h3 style={{ marginBottom: 'var(--space-sm)' }}>You're not in a gang</h3>
-                        <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-lg)' }}>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex-col gap-lg"
+                >
+                    <Card variant="glass" className="p-2xl text-center">
+                        <div className="text-4xl mb-md">👥</div>
+                        <h3 className="mb-sm">You're not in a gang</h3>
+                        <p className="text-secondary mb-lg">
                             Create your own gang or join an existing one to start building your empire.
                         </p>
                         <Button variant="primary" onClick={() => setShowCreateForm(!showCreateForm)}>
@@ -237,76 +276,94 @@ export default function GangPage() {
                         </Button>
 
                         {showCreateForm && (
-                            <form onSubmit={handleCreateGang} style={{ marginTop: 'var(--space-xl)', maxWidth: '400px', margin: '0 auto' }}>
-                                <div style={{ marginBottom: 'var(--space-md)' }}>
-                                    <label style={{ display: 'block', marginBottom: 'var(--space-sm)', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
+                            <motion.form
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                onSubmit={handleCreateGang}
+                                className="mt-xl max-w-md mx-auto"
+                            >
+                                <div className="mb-md text-left">
+                                    <label className="block mb-sm text-sm font-semibold">
                                         Gang Name
                                     </label>
-                                    <input
+                                    <Input
                                         type="text"
                                         value={gangName}
                                         onChange={(e) => setGangName(e.target.value)}
                                         placeholder="Enter gang name"
-                                        className="input-field"
                                         required
                                     />
                                 </div>
-                                <div style={{ marginBottom: 'var(--space-lg)' }}>
-                                    <label style={{ display: 'block', marginBottom: 'var(--space-sm)', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
+                                <div className="mb-lg text-left">
+                                    <label className="block mb-sm text-sm font-semibold">
                                         Gang Tag (max 10 chars)
                                     </label>
-                                    <input
+                                    <Input
                                         type="text"
                                         value={gangTag}
                                         onChange={(e) => setGangTag(e.target.value.slice(0, 10))}
                                         placeholder="TAG"
-                                        className="input-field"
                                         required
                                     />
                                 </div>
-                                <Button variant="primary" type="submit" style={{ width: '100%' }}>
-                                    Create Gang
+                                <Button variant="primary" type="submit" className="w-full">
+                                    <UserPlus size={18} className="mr-xs" /> Create Gang
                                 </Button>
-                            </form>
+                            </motion.form>
                         )}
                     </Card>
-                </div>
+                </motion.div>
             )}
 
             {/* All Gangs List */}
-            <div>
-                <h2 style={{ marginBottom: 'var(--space-lg)' }}>All Gangs ({allGangs.length})</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-lg)' }}>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+            >
+                <h2 className="mb-lg flex items-center gap-sm">
+                    <Shield className="text-info" /> All Gangs ({allGangs.length})
+                </h2>
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="grid-responsive"
+                >
                     {allGangs.map((gang) => (
-                        <Card key={gang.id} variant="glass" style={{ padding: 'var(--space-lg)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 'var(--space-md)' }}>
-                                <div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', marginBottom: 'var(--space-xs)' }}>
-                                        <h3 style={{ fontSize: 'var(--font-size-lg)' }}>{gang.name}</h3>
-                                        <Badge variant="primary">[{gang.tag}]</Badge>
+                        <motion.div key={gang.id} variants={itemVariants}>
+                            <AnimatedCard variant="default">
+                                <Card variant="glass" className="p-lg h-full">
+                                    <div className="flex justify-between items-start mb-md">
+                                        <div>
+                                            <div className="flex items-center gap-sm mb-xs">
+                                                <h3 className="text-lg">{gang.name}</h3>
+                                                <Badge variant="info">[{gang.tag}]</Badge>
+                                            </div>
+                                            <p className="text-sm text-muted flex items-center gap-xs">
+                                                <Crown size={12} /> Leader: {gang.leader.username}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>
-                                        Leader: {gang.leader.username}
-                                    </p>
-                                </div>
-                            </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-sm)' }}>
-                                    <span style={{ color: 'var(--color-text-muted)' }}>Members:</span>
-                                    <span>{gang.memberCount || 0}</span>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-sm)' }}>
-                                    <span style={{ color: 'var(--color-text-muted)' }}>Reputation:</span>
-                                    <span style={{ color: 'var(--color-accent-gold)', fontWeight: 'var(--font-weight-bold)' }}>
-                                        {gang.reputation.toLocaleString()}
-                                    </span>
-                                </div>
-                            </div>
-                        </Card>
+                                    <div className="flex-col gap-sm">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted">Members:</span>
+                                            <span>{gang.memberCount || 0}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted">Reputation:</span>
+                                            <span className="text-accent-gold font-bold">
+                                                {gang.reputation.toLocaleString()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </Card>
+                            </AnimatedCard>
+                        </motion.div>
                     ))}
-                </div>
-            </div>
-        </div>
+                </motion.div>
+            </motion.div>
+        </motion.div>
     )
 }

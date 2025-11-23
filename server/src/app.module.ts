@@ -30,6 +30,7 @@ import { MarketplaceModule } from './game/marketplace/marketplace.module';
 import { AdminModule } from './admin/admin.module';
 import { MissionModule } from './game/mission/mission.module';
 import { DrugModule } from './game/drug/drug.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { DrugModule } from './game/drug/drug.module';
     AdminModule,
     MissionModule,
     DrugModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

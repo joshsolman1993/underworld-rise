@@ -3,6 +3,8 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '../../store/authStore'
 import { authApi } from '../../api/auth.api'
+import { socketClient } from '../../api/socket'
+import { useToast } from '../../contexts/ToastContext'
 import ProgressBar from '../../components/ui/ProgressBar'
 import Badge from '../../components/ui/Badge'
 import CountUp from '../../components/ui/CountUp'
@@ -24,6 +26,7 @@ export default function DashboardLayout() {
     const navigate = useNavigate()
     const location = useLocation()
     const { user, setAuth, logout, isAuthenticated } = useAuthStore()
+    const { toast } = useToast()
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -48,6 +51,37 @@ export default function DashboardLayout() {
 
         loadUserData()
     }, [isAuthenticated, navigate, setAuth, logout])
+
+    // Socket connection effect
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        if (!token || !isAuthenticated) {
+            return
+        }
+
+        // Connect to socket
+        socketClient.connect(token)
+
+        // Listen for notifications
+        const handleNotification = (data: any) => {
+            console.log('Received notification:', data)
+
+            if (data.type === 'combat_attack') {
+                toast.error(
+                    `${data.message} ${data.attacker.username} (Lvl ${data.attacker.level}) támadott meg!`,
+                    6000
+                )
+            }
+        }
+
+        socketClient.onNotification(handleNotification)
+
+        // Cleanup on unmount
+        return () => {
+            socketClient.offNotification(handleNotification)
+            socketClient.disconnect()
+        }
+    }, [isAuthenticated, toast])
 
     if (!user) {
         return (

@@ -5,9 +5,13 @@ import { CombatService } from './combat.service';
 import { User } from '../../entities/user.entity';
 import { CombatLog } from '../../entities/combat-log.entity';
 import { Inventory } from '../../entities/inventory.entity';
+import { EventsModule } from '../../events/events.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, CombatLog, Inventory])],
+    imports: [
+        TypeOrmModule.forFeature([User, CombatLog, Inventory]),
+        EventsModule,
+    ],
     controllers: [CombatController],
     providers: [CombatService],
     exports: [CombatService],

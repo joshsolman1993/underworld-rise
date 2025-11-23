@@ -1,8 +1,30 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { shopApi, InventoryItem } from '../../api/shop.api'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
+import AnimatedCard from '../../components/ui/AnimatedCard'
+import { Crosshair, Shield, Car, Pill, Package, BarChart2 } from 'lucide-react'
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+}
+
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: { duration: 0.3 }
+    }
+}
 
 export default function InventoryPage() {
     const [inventory, setInventory] = useState<InventoryItem[]>([])
@@ -38,7 +60,7 @@ export default function InventoryPage() {
 
     if (isLoading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-2xl)' }}>
+            <div className="flex justify-center p-2xl">
                 <div className="spinner" />
             </div>
         )
@@ -46,11 +68,11 @@ export default function InventoryPage() {
 
     const getItemIcon = (type: string) => {
         switch (type.toLowerCase()) {
-            case 'weapon': return '🔫'
-            case 'armor': return '🛡️'
-            case 'vehicle': return '🏎️'
-            case 'consumable': return '💊'
-            default: return '📦'
+            case 'weapon': return <Crosshair size={32} />
+            case 'armor': return <Shield size={32} />
+            case 'vehicle': return <Car size={32} />
+            case 'consumable': return <Pill size={32} />
+            default: return <Package size={32} />
         }
     }
 
@@ -61,6 +83,16 @@ export default function InventoryPage() {
             case 'vehicle': return 'var(--color-warning)'
             case 'consumable': return 'var(--color-success)'
             default: return 'var(--color-text-primary)'
+        }
+    }
+
+    const getItemVariant = (type: string): 'success' | 'danger' | 'warning' | 'info' | 'default' => {
+        switch (type.toLowerCase()) {
+            case 'weapon': return 'danger'
+            case 'armor': return 'info'
+            case 'vehicle': return 'warning'
+            case 'consumable': return 'success'
+            default: return 'default'
         }
     }
 
@@ -83,104 +115,134 @@ export default function InventoryPage() {
         }, {} as Record<string, number>)
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2xl)' }}>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="flex-col gap-xl"
+        >
             {/* Header */}
-            <div>
-                <h1 style={{ marginBottom: 'var(--space-md)' }}>Inventory</h1>
-                <p style={{ color: 'var(--color-text-secondary)' }}>
+            <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.4 }}
+                className="glass-panel"
+            >
+                <h1 className="mb-md">Inventory</h1>
+                <p className="text-secondary mb-0">
                     Manage your items and equipment. Equipped items boost your stats.
                 </p>
-            </div>
+            </motion.div>
 
             {/* Stats Overview */}
             {Object.keys(equippedStats).length > 0 && (
-                <Card variant="glass" style={{ padding: 'var(--space-xl)' }}>
-                    <h3 style={{ marginBottom: 'var(--space-md)' }}>📊 Equipped Bonuses</h3>
-                    <div style={{ display: 'flex', gap: 'var(--space-xl)', flexWrap: 'wrap' }}>
-                        {Object.entries(equippedStats).map(([stat, value]) => (
-                            <div key={stat}>
-                                <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-xs)' }}>
-                                    {stat.charAt(0).toUpperCase() + stat.slice(1)}
+                <motion.div
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                >
+                    <Card variant="glass" className="p-xl">
+                        <h3 className="mb-md flex items-center gap-sm">
+                            <BarChart2 className="text-accent" /> Equipped Bonuses
+                        </h3>
+                        <div className="flex gap-xl flex-wrap">
+                            {Object.entries(equippedStats).map(([stat, value]) => (
+                                <div key={stat}>
+                                    <div className="text-xs text-muted mb-xs capitalize">
+                                        {stat}
+                                    </div>
+                                    <div className="text-2xl font-bold text-success font-mono">
+                                        +{value}
+                                    </div>
                                 </div>
-                                <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>
-                                    +{value}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </Card>
+                            ))}
+                        </div>
+                    </Card>
+                </motion.div>
             )}
 
             {/* Empty State */}
             {inventory.length === 0 && (
-                <Card variant="glass" style={{ padding: 'var(--space-2xl)', textAlign: 'center' }}>
-                    <div style={{ fontSize: 'var(--font-size-4xl)', marginBottom: 'var(--space-md)' }}>📦</div>
-                    <h3 style={{ marginBottom: 'var(--space-sm)' }}>Your inventory is empty</h3>
-                    <p style={{ color: 'var(--color-text-secondary)' }}>
+                <Card variant="glass" className="p-2xl text-center">
+                    <div className="text-4xl mb-md">📦</div>
+                    <h3 className="mb-sm">Your inventory is empty</h3>
+                    <p className="text-secondary">
                         Visit the shop to buy weapons, armor, and other items!
                     </p>
                 </Card>
             )}
 
             {/* Inventory by Type */}
-            {Object.entries(groupedInventory).map(([type, items]) => (
-                <div key={type}>
-                    <h2 style={{ marginBottom: 'var(--space-lg)', textTransform: 'capitalize' }}>
+            {Object.entries(groupedInventory).map(([type, items], index) => (
+                <motion.div
+                    key={type}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * index }}
+                >
+                    <h2 className="mb-lg capitalize flex items-center gap-sm">
                         {getItemIcon(type)} {type}s
                     </h2>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-lg)' }}>
+                    <motion.div
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        className="grid-responsive"
+                    >
                         {items.map((invItem) => (
-                            <Card
-                                key={invItem.id}
-                                variant="glass"
-                                style={{
-                                    padding: 'var(--space-lg)',
-                                    border: invItem.equipped ? '2px solid var(--color-accent-primary)' : undefined,
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'start', gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
-                                    <div style={{ fontSize: 'var(--font-size-3xl)' }}>{getItemIcon(invItem.item.type)}</div>
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 'var(--space-xs)' }}>
-                                            <h3 style={{ fontSize: 'var(--font-size-xl)' }}>{invItem.item.name}</h3>
-                                            {invItem.equipped && (
-                                                <Badge variant="success">Equipped</Badge>
-                                            )}
-                                        </div>
-                                        <Badge variant="info">
-                                            Qty: {invItem.quantity}
-                                        </Badge>
-                                    </div>
-                                </div>
-
-                                <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-lg)' }}>
-                                    {invItem.item.description}
-                                </p>
-
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-lg)' }}>
-                                    <span style={{ color: 'var(--color-text-muted)' }}>Effect:</span>
-                                    <span style={{ color: getItemColor(invItem.item.type), fontWeight: 'var(--font-weight-bold)' }}>
-                                        +{invItem.item.effectValue} {invItem.item.effectStat}
-                                    </span>
-                                </div>
-
-                                {invItem.item.type.toLowerCase() !== 'consumable' && (
-                                    <Button
-                                        variant={invItem.equipped ? 'outline' : 'primary'}
-                                        onClick={() => handleEquip(invItem.id)}
-                                        disabled={equipping !== null}
-                                        isLoading={equipping === invItem.id}
-                                        style={{ width: '100%' }}
+                            <motion.div key={invItem.id} variants={itemVariants}>
+                                <AnimatedCard variant={invItem.equipped ? 'success' : getItemVariant(invItem.item.type)}>
+                                    <Card
+                                        variant="glass"
+                                        className={`p-lg h-full ${invItem.equipped ? 'border-success bg-green-900/10' : ''}`}
                                     >
-                                        {invItem.equipped ? 'Unequip' : 'Equip'}
-                                    </Button>
-                                )}
-                            </Card>
+                                        <div className="flex items-start gap-md mb-md">
+                                            <div style={{ color: getItemColor(invItem.item.type), opacity: 0.7 }}>
+                                                {getItemIcon(invItem.item.type)}
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-start mb-xs">
+                                                    <h3 className="text-xl">{invItem.item.name}</h3>
+                                                    {invItem.equipped && (
+                                                        <Badge variant="success">Equipped</Badge>
+                                                    )}
+                                                </div>
+                                                <Badge variant="info" className="text-xs">
+                                                    Qty: {invItem.quantity}
+                                                </Badge>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-secondary text-sm mb-lg">
+                                            {invItem.item.description}
+                                        </p>
+
+                                        <div className="flex justify-between text-sm mb-lg">
+                                            <span className="text-muted">Effect:</span>
+                                            <span className="font-bold font-mono" style={{ color: getItemColor(invItem.item.type) }}>
+                                                +{invItem.item.effectValue} {invItem.item.effectStat}
+                                            </span>
+                                        </div>
+
+                                        {invItem.item.type.toLowerCase() !== 'consumable' && (
+                                            <Button
+                                                variant={invItem.equipped ? 'outline' : 'primary'}
+                                                onClick={() => handleEquip(invItem.id)}
+                                                disabled={equipping !== null}
+                                                isLoading={equipping === invItem.id}
+                                                className="w-full"
+                                            >
+                                                {invItem.equipped ? 'Unequip' : 'Equip'}
+                                            </Button>
+                                        )}
+                                    </Card>
+                                </AnimatedCard>
+                            </motion.div>
                         ))}
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             ))}
-        </div>
+        </motion.div>
     )
 }

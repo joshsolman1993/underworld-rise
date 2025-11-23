@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { CombatLog, CombatResult } from '../../entities/combat-log.entity';
 import { Inventory } from '../../entities/inventory.entity';
+import { EventsGateway } from '../../events/events.gateway';
 
 @Injectable()
 export class CombatService {
@@ -14,6 +15,7 @@ export class CombatService {
         private combatLogRepository: Repository<CombatLog>,
         @InjectRepository(Inventory)
         private inventoryRepository: Repository<Inventory>,
+        private eventsGateway: EventsGateway,
     ) { }
 
     async attack(attackerId: string, defenderId: string) {
@@ -163,6 +165,20 @@ export class CombatService {
         });
 
         await this.combatLogRepository.save(combatLog);
+
+        // Send real-time notification to defender if online
+        this.eventsGateway.sendNotificationToUser(defenderId, {
+            type: 'combat_attack',
+            message: 'Megtámadtak!',
+            attacker: {
+                id: attackerId,
+                username: attacker.username,
+                level: attacker.level,
+            },
+            result,
+            damage: defenderDamage,
+            moneyLost: result === CombatResult.ATTACKER_WIN ? moneyStolen : 0,
+        });
 
         return {
             result,
