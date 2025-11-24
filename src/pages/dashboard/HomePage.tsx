@@ -73,7 +73,7 @@ export default function HomePage() {
                 </motion.div>
 
                 <motion.div variants={itemVariants}>
-                    <AnimatedCard variant="danger">
+                    <AnimatedCard variant="warning">
                         <Card variant="elevated" style={{ height: '100%' }}>
                             <div className="flex justify-between items-start mb-md">
                                 <div>
@@ -84,7 +84,7 @@ export default function HomePage() {
                                         127
                                     </div>
                                 </div>
-                                <Skull size={32} className="text-danger opacity-50" />
+                                <Skull size={32} style={{ color: 'var(--color-accent-orange)', opacity: 0.5 }} />
                             </div>
                             <div className="text-xs text-secondary">
                                 Success rate: <span className="font-mono">89%</span>
@@ -105,7 +105,7 @@ export default function HomePage() {
                                         34
                                     </div>
                                 </div>
-                                <Swords size={32} className="text-accent-primary opacity-50" />
+                                <Swords size={32} style={{ color: 'var(--color-accent-tertiary)', opacity: 0.5 }} />
                             </div>
                             <div className="text-xs text-secondary">
                                 Win rate: <span className="font-mono">68%</span>
@@ -126,7 +126,7 @@ export default function HomePage() {
                                         #12
                                     </div>
                                 </div>
-                                <Users size={32} className="text-info opacity-50" />
+                                <Users size={32} style={{ color: 'var(--color-accent-teal)', opacity: 0.5 }} />
                             </div>
                             <div className="text-xs text-secondary">
                                 The Syndicate

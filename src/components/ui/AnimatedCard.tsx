@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, useMotionTemplate, useMotionValue, useSpring } from 'framer-motion';
 import '../../styles/components.css';
 
@@ -18,6 +18,7 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
     onClick
 }) => {
     const ref = useRef<HTMLDivElement>(null);
+    const [isPressed, setIsPressed] = useState(false);
 
     // Mouse position for shine effect
     const x = useMotionValue(0);
@@ -48,6 +49,7 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
         mouseY.set(0);
         x.set(0);
         y.set(0);
+        setIsPressed(false);
     }
 
     const getGlowColor = () => {
@@ -81,11 +83,16 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
             transition={{ duration: 0.5, delay, ease: [0.2, 0.8, 0.2, 1] }}
             onMouseMove={onMouseMove}
             onMouseLeave={onMouseLeave}
+            onMouseDown={() => setIsPressed(true)}
+            onMouseUp={() => setIsPressed(false)}
             onClick={onClick}
+            whileTap={onClick ? { scale: 0.98 } : {}}
             className={`animated-card ${className}`}
             style={{
                 transformStyle: "preserve-3d",
-                transform: useMotionTemplate`perspective(1000px) rotateX(${mouseY}deg) rotateY(${mouseX}deg)`
+                transform: isPressed && onClick ? 'scale(0.98)' : undefined,
+                cursor: onClick ? 'pointer' : 'default',
+                transition: 'transform 0.1s ease',
             }}
         >
             {/* Shine Effect */}

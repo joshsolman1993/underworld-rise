@@ -8,7 +8,9 @@ import { useToast } from '../../contexts/ToastContext'
 import Badge from '../../components/ui/Badge'
 import CountUp from '../../components/ui/CountUp'
 import ResourceHexagon from '../../components/ui/ResourceHexagon'
+import CompactStat from '../../components/ui/CompactStat'
 import BottomNavigation from '../../components/layout/BottomNavigation'
+import ParticleBackground from '../../components/effects/ParticleBackground'
 import {
     Home,
     Skull,
@@ -97,20 +99,23 @@ export default function DashboardLayout() {
     }
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--color-bg-primary)', color: 'var(--color-text-primary)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--color-bg-primary)', color: 'var(--color-text-primary)', position: 'relative' }}>
+            {/* P3.1: Particle Background */}
+            <ParticleBackground />
+
             {/* Top Status Bar */}
             <header
                 style={{
                     position: 'sticky',
                     top: 0,
                     zIndex: 100,
-                    background: 'rgba(3, 3, 4, 0.8)',
-                    backdropFilter: 'blur(12px)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                    background: 'rgba(3, 3, 4, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    borderBottom: '1px solid rgba(139, 92, 246, 0.2)',
                     padding: '12px 24px',
                 }}
             >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '48px', flexWrap: 'wrap' }}>
                     {/* Logo */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <h2
@@ -119,7 +124,7 @@ export default function DashboardLayout() {
                                 fontFamily: 'var(--font-display)',
                                 fontWeight: 'bold',
                                 color: 'var(--color-accent-primary)',
-                                textShadow: '0 0 10px rgba(139, 92, 246, 0.5)',
+                                textShadow: '0 0 15px rgba(139, 92, 246, 0.6)',
                                 margin: 0,
                                 letterSpacing: '0.05em'
                             }}
@@ -129,8 +134,8 @@ export default function DashboardLayout() {
                         <Badge variant="success">Lvl {user.level}</Badge>
                     </div>
 
-                    {/* Stats - Resource Hexagons */}
-                    <div style={{ flex: 1, display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {/* Stats - Desktop: Resource Hexagons */}
+                    <div className="hidden md:flex" style={{ flex: 1, display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
                         <ResourceHexagon
                             value={user.health}
                             max={100}
@@ -161,17 +166,25 @@ export default function DashboardLayout() {
                         />
                     </div>
 
+                    {/* Stats - Mobile: Compact */}
+                    <div className="flex md:hidden gap-sm" style={{ flex: 1 }}>
+                        <CompactStat icon={Heart} value={user.health} color="var(--color-danger)" />
+                        <CompactStat icon={Zap} value={user.energy} color="var(--color-warning)" />
+                        <CompactStat icon={Brain} value={user.nerve} color="var(--color-accent-primary)" />
+                        <CompactStat icon={Shield} value={user.willpower} color="var(--color-success)" />
+                    </div>
+
                     {/* Money */}
-                    <div style={{ display: 'flex', gap: '24px' }}>
+                    <div style={{ display: 'flex', gap: '32px' }}>
                         <div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Cash</div>
-                            <div style={{ fontSize: '1.125rem', color: 'var(--color-accent-gold)', fontWeight: 'bold', fontFamily: 'var(--font-mono)', textShadow: '0 0 5px rgba(251, 191, 36, 0.3)' }}>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Cash</div>
+                            <div style={{ fontSize: '1rem', color: 'var(--color-accent-gold)', fontWeight: 'bold', fontFamily: 'var(--font-mono)', textShadow: '0 0 8px rgba(251, 191, 36, 0.4)' }}>
                                 $<CountUp value={Number(user.moneyCash || 0)} format={(val) => val.toLocaleString()} />
                             </div>
                         </div>
                         <div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Bank</div>
-                            <div style={{ fontSize: '1.125rem', color: 'var(--color-accent-primary)', fontWeight: 'bold', fontFamily: 'var(--font-mono)', textShadow: '0 0 5px rgba(139, 92, 246, 0.3)' }}>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Bank</div>
+                            <div style={{ fontSize: '1rem', color: 'var(--color-accent-primary)', fontWeight: 'bold', fontFamily: 'var(--font-mono)', textShadow: '0 0 8px rgba(139, 92, 246, 0.4)' }}>
                                 $<CountUp value={isNaN(Number(user.moneyBank)) ? 0 : Number(user.moneyBank)} format={(val) => val.toLocaleString()} />
                             </div>
                         </div>
@@ -263,26 +276,34 @@ export default function DashboardLayout() {
 
                 {/* Main Content */}
                 <main style={{ flex: 1, padding: '32px', paddingBottom: '80px', overflowY: 'auto', position: 'relative' }}>
+                    {/* P3.2: Advanced Page Transitions */}
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={location.pathname}
                             initial={{
                                 opacity: 0,
                                 x: -20,
-                                filter: 'blur(4px) hue-rotate(90deg)'
+                                filter: 'blur(8px) hue-rotate(90deg) saturate(0.5)',
+                                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
                             }}
                             animate={{
                                 opacity: 1,
                                 x: 0,
-                                filter: 'blur(0px) hue-rotate(0deg)'
+                                filter: 'blur(0px) hue-rotate(0deg) saturate(1)',
+                                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
                             }}
                             exit={{
                                 opacity: 0,
                                 x: 20,
-                                filter: 'blur(4px) hue-rotate(-90deg)'
+                                filter: 'blur(8px) hue-rotate(-90deg) saturate(0.5)',
+                                clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
                             }}
-                            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                            style={{ height: '100%' }}
+                            transition={{
+                                duration: 0.5,
+                                ease: [0.22, 1, 0.36, 1],
+                                clipPath: { duration: 0.6, ease: 'easeInOut' }
+                            }}
+                            style={{ height: '100%', position: 'relative' }}
                         >
                             <Outlet />
                         </motion.div>
